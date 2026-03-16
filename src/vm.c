@@ -9,15 +9,27 @@
  *
  * @brief Pushes a value onto the stack
  *
+ * @details Checks for stack overflow first, otherwise stops the program.
+ *
+ * If no stack overflow found, value is pushed onto a stack.
+ *
  * @param vm Reference to the virtual machine stack
  * @param value Value to push onto the referenced stack
  */
 void push(VM *vm, int value) {
+    if (vm->sp >= 256) {
+        printf("Stack overflow\n");
+        vm->running = 0;
+        return;
+    }
+
     vm->stack[vm->sp++] = value;
 }
 
 /**
  * @brief Pop the pointer value from the stack
+ *
+ * Runs a check on stuck underflow, so operations would perform if and only if there's something in the stack.
  *
  * @param vm Reference to the virtual machine stack
  * @return Performs the operation and returns the popped value.
@@ -25,6 +37,12 @@ void push(VM *vm, int value) {
  * Think of it as taking the value from the data store first and then putting it into the variable to use later.
  */
 int pop(VM *vm) {
+    if (vm->sp == 0) {
+        printf("Stack underflow\n");
+        vm->running = 0;
+        return 0;
+    }
+
     return vm->stack[--vm->sp];
 }
 
