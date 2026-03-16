@@ -1,4 +1,4 @@
-# vm
+# C Virtual Machine
 
 A lightweight stack-based virtual machine written in C (C11 standard).
 
