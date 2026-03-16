@@ -1,0 +1,34 @@
+# Build output
+cmake-build-*/
+build/
+
+# CLion / JetBrains IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+install_manifest.txt
+compile_commands.json
+
+# Compiled output
+*.o
+*.a
+*.so
+*.out
+*.exe
+
+# Dependency / external libs
+vcpkg_installed/
+_deps/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
