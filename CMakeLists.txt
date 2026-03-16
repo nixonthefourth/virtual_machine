@@ -3,6 +3,9 @@ project(virtual_machine C)
 
 set(CMAKE_C_STANDARD 11)
 
+include_directories(include)
+include_directories(src)
+
 add_executable(virtual_machine src/main.c
         src/vm.c
         include/vm.h)
