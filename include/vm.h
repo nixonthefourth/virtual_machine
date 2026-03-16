@@ -15,8 +15,10 @@ enum {
     OP_POP,
     OP_ADD,
     OP_SUB,
-    OP_PRT,
-    OP_HLT
+    OP_PRINT,
+    OP_HALT,
+    OP_MULT,
+    OP_DIV
 };
 
 /**

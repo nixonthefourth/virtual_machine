@@ -8,7 +8,7 @@ int main() {
         OP_PUSH, 8,
         OP_PUSH, 5,
         OP_ADD,
-        OP_PRT,
+        OP_PRINT,
         OP_HLT
     };
 

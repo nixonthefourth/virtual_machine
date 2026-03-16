@@ -52,8 +52,14 @@ void vm_run(VM *vm)
                 pop(vm);
                 break;
 
-            /** Add two values together and pop them from the stack */
+            /** Add two values together and pop them from the stack. Checks for underflow. */
             case OP_ADD: {
+                if (vm->sp < 2) {
+                    printf("Stack underflow\n");
+                    vm->running = 0;
+                    break;
+                }
+
                 int b = pop(vm);
                 int a = pop(vm);
 
@@ -80,14 +86,56 @@ void vm_run(VM *vm)
             }
 
             /** Print operation that prints the result and pop the value from the stack */
-            case OP_PRT:
+            case OP_PRINT:
                 printf("%d\n", pop(vm));
                 break;
 
             /** Stops the Virtual Machine */
-            case OP_HLT:
+            case OP_HALT:
                 vm->running = 0;
                 break;
+
+            /** Multiplication. Checks for underflow. */
+            case OP_MULT: {
+                if (vm->sp < 2) {
+                    printf("Stack underflow\n");
+                    vm->running = 0;
+                    break;
+                }
+
+                int b = pop(vm);
+                int a = pop(vm);
+
+                push(vm, a * b);
+                break;
+            }
+
+            /** Division */
+            case OP_DIV: {
+                // Check for Stack Underflow
+                if (vm->sp < 2) {
+                    printf("Stack underflow\n");
+                    vm->running = 0;
+                    break;
+                }
+
+                // Initially take value of `b`
+                int b = pop(vm);
+
+                // Check whether it is equal to zero
+                // If that's the case – interrupt operation
+                if (b == 0) {
+                    printf("Division by zero, error\n");
+                    vm->running = 0;
+                    break;
+                }
+
+                // Otherwise, we are good to go
+                int a = pop(vm);
+
+                push(vm, a / b);
+                break;
+            }
         }
     }
 }
