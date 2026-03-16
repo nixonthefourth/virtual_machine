@@ -5,11 +5,16 @@ A lightweight stack-based virtual machine written in C (C11 standard).
 ## Project Structure
 ```
 vm/
-├── main.c
+├── src/
+│   ├── main.c
+│   └── vm.c
+│
+├── include/
+│   └── vm.h
+│
 ├── README.md
-├── .gitignore
-├── vm.h
-└── vm.c
+│
+└── .gitignore
 ```
 
 ## Getting Started
