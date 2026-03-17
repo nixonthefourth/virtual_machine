@@ -75,7 +75,7 @@ void op_mod(VM *vm);
  *
  * @param vm The reference to the actual memory of the virtual machine.
  */
-void op_jmp(VM *vm);
+void op_jump(VM *vm);
 
 /**
  * @brief Jump if zero. Checks for stack underflow.

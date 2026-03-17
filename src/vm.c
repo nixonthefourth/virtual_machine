@@ -91,7 +91,7 @@ void vm_run(VM *vm)
             case OP_MOD: { op_mod(vm); break; }
 
             /** Jump */
-            case OP_JMP: { op_jmp(vm); break; }
+            case OP_JMP: { op_jump(vm); break; }
 
             /** Jump if Zero */
             case OP_JZ: { op_jump_zero(vm); break; }
