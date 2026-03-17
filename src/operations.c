@@ -168,3 +168,56 @@ void op_jump_zero(VM *vm) {
         vm->ip = addr;
     }
 }
+
+/**
+ * @brief Duplicate the top of the stack.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_dup(VM *vm) {
+    // Check for stack underflow
+    if (vm->sp == 0) {
+        printf("Stack underflow\n");
+        vm->running = 0;
+        return;
+    }
+
+    int top = vm->stack[vm->sp - 1];
+    push(vm, top);
+}
+
+/**
+ * @brief Swap for two.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_swap(VM *vm) {
+    if (vm->sp < 2) {
+        printf("Stack underflow\n");
+        vm->running = 0;
+        return;
+    }
+
+    int a = pop(vm);
+    int b = pop(vm);
+    push(vm, a);
+    push(vm, b);
+}
+
+/**
+ * @brief Equality operator.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_eq(VM *vm) {
+    // Check for stack underflow
+    if (vm->sp < 2) {
+        printf("Stack underflow\n");
+        vm->running = 0;
+        return;
+    }
+
+    int b = pop(vm);
+    int a = pop(vm);
+    push(vm, a == b);
+}

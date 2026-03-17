@@ -84,4 +84,25 @@ void op_jump(VM *vm);
  */
 void op_jump_zero(VM *vm);
 
+/**
+ * @brief Duplicate the top of the stack.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_dup(VM *vm);
+
+/**
+ * @brief Swap for two.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_swap(VM *vm);
+
+/**
+ * @brief Equality operator.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_eq(VM *vm);
+
 #endif //VIRTUAL_MACHINE_OPERATIONS_H

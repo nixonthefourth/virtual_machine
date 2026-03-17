@@ -21,7 +21,10 @@ enum {
     OP_DIV,
     OP_MOD,
     OP_JMP,
-    OP_JZ
+    OP_JZ,
+    OP_DUP,
+    OP_SWAP,
+    OP_EQ
 };
 
 /**

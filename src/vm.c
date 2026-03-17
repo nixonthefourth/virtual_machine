@@ -95,6 +95,15 @@ void vm_run(VM *vm)
 
             /** Jump if Zero */
             case OP_JZ: { op_jump_zero(vm); break; }
+
+            /** Duplicate the top of the stack */
+            case OP_DUP: { op_dup(vm); break; }
+
+            /** Swap */
+            case OP_SWAP: { op_swap(vm); break; }
+
+            /** Equality Operator */
+            case OP_EQ: { op_eq(vm); break; }
         }
     }
 }
