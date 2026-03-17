@@ -9,7 +9,7 @@ int main() {
         OP_PUSH, 5,
         OP_ADD,
         OP_PRINT,
-        OP_HLT
+        OP_HALT
     };
 
     VM vm = {0};
