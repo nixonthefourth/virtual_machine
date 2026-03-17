@@ -32,7 +32,8 @@ void push(VM *vm, int value) {
  *
  * Runs a check on stuck underflow, so operations would perform if and only if there's something in the stack.
  *
- * @param vm Reference to the virtual machine stack
+ * @param vm Reference to the virtual machine stack.
+ *
  * @return Performs the operation and returns the popped value.
  *
  * Think of it as taking the value from the data store first and then putting it into the variable to use later.
@@ -48,9 +49,9 @@ int pop(VM *vm) {
 }
 
 /**
- * @brief The virtual machine runtime
+ * @brief The virtual machine runtime simulation.
  *
- * @param vm Reference to the virtual machine stack
+ * @param vm Reference to the virtual machine stack.
  *
  * @details Performs opcode operations, such as PUSH, POP, ADD, SUB, PRT and HLT.
  */
@@ -85,6 +86,15 @@ void vm_run(VM *vm)
 
             /** Division */
             case OP_DIV: { op_div(vm); break; }
+
+            /** Modulo */
+            case OP_MOD: { op_mod(vm); break; }
+
+            /** Jump */
+            case OP_JMP: { op_jmp(vm); break; }
+
+            /** Jump if Zero */
+            case OP_JZ: { op_jump_zero(vm); break; }
         }
     }
 }

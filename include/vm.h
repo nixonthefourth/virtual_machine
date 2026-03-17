@@ -18,7 +18,10 @@ enum {
     OP_PRINT,
     OP_HALT,
     OP_MULT,
-    OP_DIV
+    OP_DIV,
+    OP_MOD,
+    OP_JMP,
+    OP_JZ
 };
 
 /**

@@ -7,7 +7,7 @@
 #include "vm.h"
 
 /**
- * @brief Pushes the value onto a stack
+ * @brief Pushes the value onto a stack.
  *
  * @param vm The reference to the actual memory of the virtual machine.
  */
@@ -62,5 +62,26 @@ void op_mult(VM *vm);
  * @param vm The reference to the actual memory of the virtual machine.
  */
 void op_div(VM *vm);
+
+/**
+ * @brief Performs the modulo operation.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_mod(VM *vm);
+
+/**
+ * @brief Performs an unconditional jump.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_jmp(VM *vm);
+
+/**
+ * @brief Jump if zero. Checks for stack underflow.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_jump_zero(VM *vm);
 
 #endif //VIRTUAL_MACHINE_OPERATIONS_H

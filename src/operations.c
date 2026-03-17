@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 /**
- * @brief Pushes the value onto a stack
+ * @brief Pushes the value onto a stack.
  *
  * @param vm The reference to the actual memory of the virtual machine.
  */
@@ -114,4 +114,57 @@ void op_div(VM *vm) {
     int a = pop(vm);
 
     push(vm, a / b);
+}
+
+/**
+ * @brief Performs the modulo operation.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_mod(VM *vm) {
+    // Check for Stack Underflow
+    if (vm->sp < 2) {
+        printf("Stack underflow\n");
+        vm->running = 0;
+    }
+
+    int b = pop(vm);
+    int a = pop(vm);
+
+    push(vm, a % b);
+}
+
+/**
+ * @brief Performs an unconditional jump.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_jump(VM *vm) {
+    int addr = vm->program[vm->ip++];
+    vm->ip = addr;
+}
+
+/**
+ * @brief Jump if zero. Checks for stack underflow.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_jump_zero(VM *vm) {
+    // Operand fetch
+    int addr = vm->program[vm->ip++];
+
+    // Check for stack underflow
+    if (vm->sp == 0) {
+        printf("Stack underflow\n");
+        vm->running = 0;
+        return;
+    }
+
+    // Get the top of the stack
+    int top = pop(vm);
+
+    // Perform action
+    if (top == 0) {
+        vm->ip = addr;
+    }
 }
