@@ -8,4 +8,6 @@ include_directories(src)
 
 add_executable(virtual_machine src/main.c
         src/vm.c
-        include/vm.h)
+        include/vm.h
+        src/operations.c
+        include/operations.h)
