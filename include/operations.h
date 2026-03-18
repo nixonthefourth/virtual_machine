@@ -133,4 +133,12 @@ void op_store(VM *vm);
  */
 void op_load(VM *vm);
 
+
+/**
+ * @brief Non-destructive read that checks for the stack underflow.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_peek(VM *vm);
+
 #endif //VIRTUAL_MACHINE_OPERATIONS_H

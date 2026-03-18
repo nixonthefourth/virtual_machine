@@ -28,7 +28,8 @@ enum {
     LT,
     GT,
     LD,
-    ST
+    ST,
+    PEEK
 };
 
 /**

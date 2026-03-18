@@ -26,15 +26,19 @@ void op_pop(VM *vm) { pop(vm); }
  * @param vm The reference to the actual memory of the virtual machine.
  */
 void op_add(VM *vm) {
+    /** Check for stack underflow */
     if (vm->sp < 2) {
         printf("Stack underflow\n");
         vm->running = 0;
     }
 
-    int b = pop(vm);
-    int a = pop(vm);
+    // Successful case
+    else {
+        int b = pop(vm);
+        int a = pop(vm);
 
-    push(vm, a + b);
+        push(vm, a + b);
+    }
 }
 
 /**
@@ -43,11 +47,13 @@ void op_add(VM *vm) {
  * @param vm The reference to the actual memory of the virtual machine.
  */
 void op_sub(VM *vm) {
+    /** Check for stack underflow */
     if (vm->sp < 2) {
         printf("Stack underflow\n");
         vm->running = 0;
     }
 
+    // Successful case
     else {
         int b = pop(vm);
         int a = pop(vm);
@@ -76,15 +82,19 @@ void op_halt(VM *vm) { vm->running = 0; }
  * @param vm The reference to the actual memory of the virtual machine.
  */
 void op_mult(VM *vm) {
+    /** Check for stack underflow */
     if (vm->sp < 2) {
         printf("Stack underflow\n");
         vm->running = 0;
     }
 
-    int b = pop(vm);
-    int a = pop(vm);
+    // Successful Case
+    else {
+        int b = pop(vm);
+        int a = pop(vm);
 
-    push(vm, a * b);
+        push(vm, a * b);
+    }
 }
 
 /**
@@ -128,10 +138,13 @@ void op_mod(VM *vm) {
         vm->running = 0;
     }
 
-    int b = pop(vm);
-    int a = pop(vm);
+    // Successful Case
+    else {
+        int b = pop(vm);
+        int a = pop(vm);
 
-    push(vm, a % b);
+        push(vm, a % b);
+    }
 }
 
 /**
@@ -180,8 +193,11 @@ void op_dup(VM *vm) {
         vm->running = 0;
     }
 
-    int top = vm->stack[vm->sp - 1];
-    push(vm, top);
+    // Successful case
+    else {
+        int top = vm->stack[vm->sp - 1];
+        push(vm, top);
+    }
 }
 
 /**
@@ -190,15 +206,19 @@ void op_dup(VM *vm) {
  * @param vm The reference to the actual memory of the virtual machine.
  */
 void op_swap(VM *vm) {
+    /** Check for the stack underflow */
     if (vm->sp < 2) {
         printf("Stack underflow\n");
         vm->running = 0;
     }
 
-    int a = pop(vm);
-    int b = pop(vm);
-    push(vm, a);
-    push(vm, b);
+    // Successful Case
+    else {
+        int a = pop(vm);
+        int b = pop(vm);
+        push(vm, a);
+        push(vm, b);
+    }
 }
 
 /**
@@ -213,9 +233,12 @@ void op_eq(VM *vm) {
         vm->running = 0;
     }
 
-    int b = pop(vm);
-    int a = pop(vm);
-    push(vm, a == b);
+    // Successful Case
+    else {
+        int b = pop(vm);
+        int a = pop(vm);
+        push(vm, a == b);
+    }
 }
 
 /**
@@ -230,9 +253,12 @@ void op_lt(VM *vm) {
         vm->running = 0;
     }
 
-    int b = pop(vm);
-    int a = pop(vm);
-    push(vm, a < b);
+    // Successful Case
+    else {
+        int b = pop(vm);
+        int a = pop(vm);
+        push(vm, a < b);
+    }
 }
 
 /**
@@ -247,9 +273,12 @@ void op_gt(VM *vm) {
         vm->running = 0;
     }
 
-    int b = pop(vm);
-    int a = pop(vm);
-    push(vm, a > b);
+    // Successful Case
+    else {
+        int b = pop(vm);
+        int a = pop(vm);
+        push(vm, a > b);
+    }
 }
 
 /**
@@ -265,14 +294,12 @@ void op_store(VM *vm) {
     if (reg < 0 || reg >= 16) {
         printf("Invalid register: %d\n", reg);
         vm->running = 0;
-        return;
     }
 
     /** Checks for stack undeflow */
     if (vm->sp == 0) {
         printf("Stack underflow\n");
         vm->running = 0;
-        return;
     }
 
     /** Remove value from the stack and push it to the register */
@@ -292,9 +319,27 @@ void op_load(VM *vm) {
     if (reg < 0 || reg >= 16) {
         printf("Invalid register: %d\n", reg);
         vm->running = 0;
-        return;
     }
 
-    /** Load the value into the register */
-    push(vm, vm->registers[reg]);
+    // Successful Case
+    else {
+        /** Load the value into the register */
+        push(vm, vm->registers[reg]);
+    }
+}
+
+/**
+ * @brief Non-destructive read that checks for the stack underflow.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_peek(VM *vm) {
+    /** Check for stack underflow */
+    if (vm->sp == 0) {
+        printf("Stack underflow\n");
+        vm->running = 0;
+    }
+
+    // Perform the operation
+    printf("%d\n", vm->stack[vm->sp - 1]);
 }

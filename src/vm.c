@@ -116,6 +116,9 @@ void vm_run(VM *vm)
 
             /** Store */
             case ST: { op_store(vm); break; }
+
+            /** Peek */
+            case PEEK: { op_peek(vm); break; }
         }
     }
 }
