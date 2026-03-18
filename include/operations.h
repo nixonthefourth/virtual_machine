@@ -119,4 +119,18 @@ void op_lt(VM *vm);
  */
 void op_gt(VM *vm);
 
+/**
+ * @brief Store operation. Checks for the register validity and stack underflow.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_store(VM *vm);
+
+/**
+ * @brief Load operation. Checks for the register validity and stack underflow.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_load(VM *vm);
+
 #endif //VIRTUAL_MACHINE_OPERATIONS_H

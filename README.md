@@ -55,24 +55,26 @@ typedef struct {
 
 ## Instruction Set
 
-| Opcode  | Description                                     | Stack Effect         |
-|---------|-------------------------------------------------|----------------------|
-| `PUSH n`| Push value `n` onto the stack                   | `→ [n]`              |
-| `POP`   | Discard the top value                           | `[a] →`              |
-| `ADD`   | Add top two values                              | `[a, b] → [a+b]`     |
-| `SUB`   | Subtract top two values                         | `[a, b] → [a-b]`     |
-| `MULT`  | Multiply top two values                         | `[a, b] → [a*b]`     |
-| `DIV`   | Divide top two values (checks ÷0)               | `[a, b] → [a/b]`     |
-| `MOD`   | Modulo of top two values                        | `[a, b] → [a%b]`     |
-| `PRINT` | Print and pop top value                         | `[a] →`              |
-| `HALT`  | Stop execution                                  | —                    |
-| `JMP n` | Unconditional jump to address `n`               | —                    |
-| `JZ n`  | Jump to `n` if top of stack is zero             | `[a] →`              |
-| `DUP`   | Duplicate top of stack                          | `[a] → [a, a]`       |
-| `SWAP`  | Swap top two values                             | `[a, b] → [b, a]`    |
-| `EQ`    | Push `1` if equal, else `0`                     | `[a, b] → [a==b]`    |
-| `LT`    | Push `1` if `a < b`, else `0`                   | `[a, b] → [a<b]`     |
-| `GT`    | Push `1` if `a > b`, else `0`                   | `[a, b] → [a>b]`     |
+| Opcode   | Description                                                 | Stack Effect      |
+|----------|-------------------------------------------------------------|-------------------|
+| `PUSH n` | Push value `n` onto the stack                               | `→ [n]`           |
+| `POP`    | Discard the top value                                       | `[a] →`           |
+| `ADD`    | Add top two values                                          | `[a, b] → [a+b]`  |
+| `SUB`    | Subtract top two values                                     | `[a, b] → [a-b]`  |
+| `MULT`   | Multiply top two values                                     | `[a, b] → [a*b]`  |
+| `DIV`    | Divide top two values (checks ÷0)                           | `[a, b] → [a/b]`  |
+| `MOD`    | Modulo of top two values                                    | `[a, b] → [a%b]`  |
+| `PRINT`  | Print and pop top value                                     | `[a] →`           |
+| `HALT`   | Stop execution                                              | —                 |
+| `JMP n`  | Unconditional jump to address `n`                           | —                 |
+| `JZ n`   | Jump to `n` if top of stack is zero                         | `[a] →`           |
+| `DUP`    | Duplicate top of stack                                      | `[a] → [a, a]`    |
+| `SWAP`   | Swap top two values                                         | `[a, b] → [b, a]` |
+| `EQ`     | Push `1` if equal, else `0`                                 | `[a, b] → [a==b]` |
+| `LT`     | Push `1` if `a < b`, else `0`                               | `[a, b] → [a<b]`  |
+| `GT`     | Push `1` if `a > b`, else `0`                               | `[a, b] → [a>b]`  |
+| `ST`     | Store value from the stack into the next availible register.| `[a] →`           |
+| `LD`     | Load value from the register to the stack.                  | `→ [a]`           |
 
 ---
 

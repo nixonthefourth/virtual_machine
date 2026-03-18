@@ -26,7 +26,9 @@ enum {
     SWAP,
     EQ,
     LT,
-    GT
+    GT,
+    LD,
+    ST
 };
 
 /**

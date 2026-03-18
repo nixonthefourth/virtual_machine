@@ -110,6 +110,12 @@ void vm_run(VM *vm)
 
             /** Greater Than Operator */
             case GT: { op_gt(vm); break; }
+
+            /** Load */
+            case LD: { op_load(vm); break; }
+
+            /** Store */
+            case ST: { op_store(vm); break; }
         }
     }
 }

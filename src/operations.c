@@ -251,3 +251,50 @@ void op_gt(VM *vm) {
     int a = pop(vm);
     push(vm, a > b);
 }
+
+/**
+ * @brief Store operation. Checks for the register validity and stack underflow.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_store(VM *vm) {
+    /** Checks register */
+    int reg = vm->program[vm->ip++];
+
+    /** Cheks whether the register is valid */
+    if (reg < 0 || reg >= 16) {
+        printf("Invalid register: %d\n", reg);
+        vm->running = 0;
+        return;
+    }
+
+    /** Checks for stack undeflow */
+    if (vm->sp == 0) {
+        printf("Stack underflow\n");
+        vm->running = 0;
+        return;
+    }
+
+    /** Remove value from the stack and push it to the register */
+    vm->registers[reg] = pop(vm);
+}
+
+/**
+ * @brief Load operation. Checks for the register validity and stack underflow.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_load(VM *vm) {
+    /** Select register */
+    int reg = vm->program[vm->ip++];
+
+    /** Check for the stack underflow */
+    if (reg < 0 || reg >= 16) {
+        printf("Invalid register: %d\n", reg);
+        vm->running = 0;
+        return;
+    }
+
+    /** Load the value into the register */
+    push(vm, vm->registers[reg]);
+}
