@@ -63,47 +63,53 @@ void vm_run(VM *vm)
 
         switch (opcode) {
             /** Push the value onto a stack */
-            case OP_PUSH: { op_push(vm); break; }
+            case PUSH: { op_push(vm); break; }
 
             /** Pop the value from the stack */
-            case OP_POP: { op_pop(vm); break; }
+            case POP: { op_pop(vm); break; }
 
             /** Add two values together and pop them from the stack. Checks for underflow. */
-            case OP_ADD: { op_add(vm); break; }
+            case ADD: { op_add(vm); break; }
 
             /** Substitute two values (could be signed integers) and remove them form the stack.
              * Checks for underflow */
-            case OP_SUB: { op_sub(vm); break; }
+            case SUB: { op_sub(vm); break; }
 
             /** Print operation that prints the result and pop the value from the stack */
-            case OP_PRINT: { op_print(vm); break; }
+            case PRINT: { op_print(vm); break; }
 
             /** Stops the Virtual Machine */
-            case OP_HALT: { op_halt(vm); break; }
+            case HALT: { op_halt(vm); break; }
 
             /** Multiplication. Checks for underflow. */
-            case OP_MULT: { op_mult(vm); break; }
+            case MULT: { op_mult(vm); break; }
 
             /** Division */
-            case OP_DIV: { op_div(vm); break; }
+            case DIV: { op_div(vm); break; }
 
             /** Modulo */
-            case OP_MOD: { op_mod(vm); break; }
+            case MOD: { op_mod(vm); break; }
 
             /** Jump */
-            case OP_JMP: { op_jump(vm); break; }
+            case JMP: { op_jump(vm); break; }
 
             /** Jump if Zero */
-            case OP_JZ: { op_jump_zero(vm); break; }
+            case JZ: { op_jump_zero(vm); break; }
 
             /** Duplicate the top of the stack */
-            case OP_DUP: { op_dup(vm); break; }
+            case DUP: { op_dup(vm); break; }
 
             /** Swap */
-            case OP_SWAP: { op_swap(vm); break; }
+            case SWAP: { op_swap(vm); break; }
 
             /** Equality Operator */
-            case OP_EQ: { op_eq(vm); break; }
+            case EQ: { op_eq(vm); break; }
+
+            /** Less Than Operator */
+            case LT: { op_lt(vm); break; }
+
+            /** Greater Than Operator */
+            case GT: { op_gt(vm); break; }
         }
     }
 }

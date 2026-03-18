@@ -11,20 +11,22 @@
  * @details Opcodes are as such: PUSH, POP, ADD, SUB, PRT and HLT.
  */
 enum {
-    OP_PUSH,
-    OP_POP,
-    OP_ADD,
-    OP_SUB,
-    OP_PRINT,
-    OP_HALT,
-    OP_MULT,
-    OP_DIV,
-    OP_MOD,
-    OP_JMP,
-    OP_JZ,
-    OP_DUP,
-    OP_SWAP,
-    OP_EQ
+    PUSH,
+    POP,
+    ADD,
+    SUB,
+    PRINT,
+    HALT,
+    MULT,
+    DIV,
+    MOD,
+    JMP,
+    JZ,
+    DUP,
+    SWAP,
+    EQ,
+    LT,
+    GT
 };
 
 /**

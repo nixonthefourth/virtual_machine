@@ -5,11 +5,11 @@ int main() {
     printf("Welcome to the Virtual Machine!\n");
 
     int program[] = {
-        OP_PUSH, 8,
-        OP_PUSH, 5,
-        OP_ADD,
-        OP_PRINT,
-        OP_HALT
+        PUSH, 8,
+        PUSH, 5,
+        ADD,
+        PRINT,
+        HALT
     };
 
     VM vm = {0};

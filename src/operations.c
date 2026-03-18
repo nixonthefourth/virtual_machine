@@ -157,7 +157,6 @@ void op_jump_zero(VM *vm) {
     if (vm->sp == 0) {
         printf("Stack underflow\n");
         vm->running = 0;
-        return;
     }
 
     // Get the top of the stack
@@ -179,7 +178,6 @@ void op_dup(VM *vm) {
     if (vm->sp == 0) {
         printf("Stack underflow\n");
         vm->running = 0;
-        return;
     }
 
     int top = vm->stack[vm->sp - 1];
@@ -195,7 +193,6 @@ void op_swap(VM *vm) {
     if (vm->sp < 2) {
         printf("Stack underflow\n");
         vm->running = 0;
-        return;
     }
 
     int a = pop(vm);
@@ -214,10 +211,43 @@ void op_eq(VM *vm) {
     if (vm->sp < 2) {
         printf("Stack underflow\n");
         vm->running = 0;
-        return;
     }
 
     int b = pop(vm);
     int a = pop(vm);
     push(vm, a == b);
+}
+
+/**
+ * @brief Less than operation. Checks for the stack underflow.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_lt(VM *vm) {
+    // Check for stack underflow
+    if (vm->sp < 2) {
+        printf("Stack underflow\n");
+        vm->running = 0;
+    }
+
+    int b = pop(vm);
+    int a = pop(vm);
+    push(vm, a < b);
+}
+
+/**
+ * @brief Greater than operation. Checks for the stack underflow.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_gt(VM *vm) {
+    // Check for stack underflow
+    if (vm->sp < 2) {
+        printf("Stack underflow\n");
+        vm->running = 0;
+    }
+
+    int b = pop(vm);
+    int a = pop(vm);
+    push(vm, a > b);
 }

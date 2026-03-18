@@ -105,4 +105,18 @@ void op_swap(VM *vm);
  */
 void op_eq(VM *vm);
 
+/**
+ * @brief Less than operation. Checks for the stack underflow.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_lt(VM *vm);
+
+/**
+ * @brief Greater than operation. Checks for the stack underflow.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_gt(VM *vm);
+
 #endif //VIRTUAL_MACHINE_OPERATIONS_H
