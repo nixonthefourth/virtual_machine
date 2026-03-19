@@ -4,7 +4,11 @@
 
 #include "../include/vm.h"
 #include <stdio.h>
-#include "../include/operations.h"
+#include "operations/maths.h"
+#include "operations/stack.h"
+#include "operations/flow.h"
+#include "operations/logic.h"
+#include "operations/registers.h"
 
 /**
  *

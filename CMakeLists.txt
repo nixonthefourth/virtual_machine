@@ -9,5 +9,13 @@ include_directories(src)
 add_executable(virtual_machine src/main.c
         src/vm.c
         include/vm.h
-        src/operations.c
-        include/operations.h)
+        src/operations/stack.c
+        include/operations/stack.h
+        src/operations/maths.c
+        include/operations/maths.h
+        src/operations/flow.c
+        include/operations/flow.h
+        src/operations/logic.c
+        include/operations/logic.h
+        src/operations/registers.c
+        include/operations/registers.h)

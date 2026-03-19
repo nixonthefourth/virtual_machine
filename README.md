@@ -9,13 +9,23 @@ A lightweight, stack-based virtual machine written in C (C11 standard), featurin
 ```
 vm/
 ├── src/
-│   ├── main.c          # Entry point & example program
-│   ├── vm.c            # Core VM runtime (push, pop, vm_run)
-│   └── operations.c    # Opcode implementations
+│   ├── main.c             # Runtime ignition
+│   ├── vm.c               # Virtual machine engine and logic
+│   └── operations/        # Operand commands
+│       ├── flow.c         # Flow control
+│       ├── logic.c        # Logics
+│       ├── maths.c        # Mathematical operations
+│       ├── registers.c    # Register operations
+│       └── stack.c        # Stack operations
 │
 ├── include/
-│   ├── vm.h            # VM struct, opcodes, core function declarations
-│   └── operations.h    # Operation function declarations
+│   ├── vm.h               # Virtual machine's memory
+│   └── operations/        # Operand commands
+│       ├── flow.c         # Flow control
+│       ├── logic.c        # Logics
+│       ├── maths.c        # Mathematical operations
+│       ├── registers.c    # Register operations
+│       └── stack.c        # Stack operations
 │
 ├── README.md
 └── .gitignore
@@ -83,18 +93,6 @@ typedef struct {
 ### Prerequisites
 
 - GCC or Clang with C11 support
-
-### Build
-
-```bash
-gcc -std=c11 -Wall -Wextra -o vm src/main.c src/vm.c src/operations.c -Iinclude
-```
-
-### Run
-
-```bash
-./vm
-```
 
 ---
 
@@ -165,8 +163,9 @@ The VM handles runtime errors gracefully by printing a message and halting:
 To add a new opcode:
 
 1. **Declare it** in the `enum` in `include/vm.h`
-2. **Implement it** as `op_yourname(VM *vm)` in `src/operations.c`
-3. **Declare it** in `include/operations.h`
+2. **Implement it** as `op_yourname(VM *vm)` in `src/operations/~`
+3. **Name it** and place in a correct operand file, or make your own!
+3. **Declare it** in `include/operations/~`
 4. **Register it** with a `case` in the `switch` inside `vm_run()` in `src/vm.c`
 
 ---
