@@ -181,11 +181,13 @@ To add a new opcode:
 - [x] Stack manipulation: `DUP`, `SWAP`, `POP`
 - [x] Comparison operators: `EQ`, `LT`, `GT`
 - [x] Runtime error detection (overflow, underflow, division by zero)
-- [ ] Local variable support via registers
+- [x] Local variable support via registers: `LD`, `ST`
 - [ ] Function calls / call stack
-- [ ] String support
-- [ ] Assembler / text-based bytecode format
-
+- [ ] Test programs at launch
+- [ ] Console I/O to both code and output the program
+- [ ] SFML interface
+- [ ] Storing files as .txt
+- [ ] LaTeX paper
 ---
 
 ## License
