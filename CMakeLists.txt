@@ -18,4 +18,7 @@ add_executable(virtual_machine src/main.c
         src/operations/logic.c
         include/operations/logic.h
         src/operations/registers.c
-        include/operations/registers.h)
+        include/operations/registers.h
+        src/io/assembler.c
+        include/io/assembler.h
+        src/io/lexer.c)

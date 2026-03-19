@@ -182,8 +182,7 @@ To add a new opcode:
 - [x] Runtime error detection (overflow, underflow, division by zero)
 - [x] Local variable support via registers: `LD`, `ST`
 - [x] Function calls / call stack
-- [ ] Test programs at launch
-- [ ] Console I/O to both code and output the program
+- [x] Console I/O to both code and output the program
 - [ ] SFML interface
 - [ ] Storing files as .txt
 - [ ] LaTeX paper
