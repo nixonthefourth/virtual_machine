@@ -67,62 +67,79 @@ void vm_run(VM *vm)
 
         switch (opcode) {
             /** Push the value onto a stack */
-            case PUSH: { op_push(vm); break; }
+            case PUSH:  { op_push(vm); break; }
 
             /** Pop the value from the stack */
-            case POP: { op_pop(vm); break; }
+            case POP:   { op_pop(vm); break; }
 
             /** Add two values together and pop them from the stack. Checks for underflow. */
-            case ADD: { op_add(vm); break; }
+            case ADD:   { op_add(vm); break; }
 
-            /** Substitute two values (could be signed integers) and remove them form the stack.
-             * Checks for underflow */
-            case SUB: { op_sub(vm); break; }
+            /** Substitute two values (could be signed integers) and remove them from the stack. */
+            case SUB:   { op_sub(vm); break; }
 
             /** Print operation that prints the result and pop the value from the stack */
             case PRINT: { op_print(vm); break; }
 
             /** Stops the Virtual Machine */
-            case HALT: { op_halt(vm); break; }
+            case HALT:  { op_halt(vm); break; }
 
             /** Multiplication. Checks for underflow. */
-            case MULT: { op_mult(vm); break; }
+            case MULT:  { op_mult(vm); break; }
 
             /** Division */
-            case DIV: { op_div(vm); break; }
+            case DIV:   { op_div(vm); break; }
 
             /** Modulo */
-            case MOD: { op_mod(vm); break; }
+            case MOD:   { op_mod(vm); break; }
 
-            /** Jump */
-            case JMP: { op_jump(vm); break; }
+            /** Unconditional jump */
+            case JMP:   { op_jump(vm); break; }
 
             /** Jump if Zero */
-            case JZ: { op_jump_zero(vm); break; }
+            case JZ:    { op_jump_zero(vm); break; }
+
+            /** Jump if Not Zero */
+            case JNZ:   { op_jump_not_zero(vm); break; }
 
             /** Duplicate the top of the stack */
-            case DUP: { op_dup(vm); break; }
+            case DUP:   { op_dup(vm); break; }
 
             /** Swap */
-            case SWAP: { op_swap(vm); break; }
+            case SWAP:  { op_swap(vm); break; }
 
             /** Equality Operator */
-            case EQ: { op_eq(vm); break; }
+            case EQ:    { op_eq(vm); break; }
 
             /** Less Than Operator */
-            case LT: { op_lt(vm); break; }
+            case LT:    { op_lt(vm); break; }
 
             /** Greater Than Operator */
-            case GT: { op_gt(vm); break; }
+            case GT:    { op_gt(vm); break; }
 
-            /** Load */
-            case LD: { op_load(vm); break; }
+            /** Logical AND */
+            case AND:   { op_and(vm); break; }
 
-            /** Store */
-            case ST: { op_store(vm); break; }
+            /** Logical OR */
+            case OR:    { op_or(vm); break; }
+
+            /** Logical NOT */
+            case NOT:   { op_not(vm); break; }
+
+            /** Load from register */
+            case LD:    { op_load(vm); break; }
+
+            /** Store to register */
+            case ST:    { op_store(vm); break; }
 
             /** Peek */
-            case PEEK: { op_peek(vm); break; }
+            case PEEK:  { op_peek(vm); break; }
+
+            /** Function call — saves return address and jumps */
+            case CALL:  { op_call(vm); break; }
+
+            /** Return — restores ip from call stack */
+            case RET:   { op_ret(vm); break; }
         }
     }
 }

@@ -29,7 +29,13 @@ enum {
     GT,
     LD,
     ST,
-    PEEK
+    PEEK,
+    AND,
+    OR,
+    NOT,
+    JNZ,
+    CALL,
+    RET
 };
 
 /**
@@ -56,6 +62,13 @@ typedef struct {
 
     /** Pointer to the program bytecode */
     int *program;
+
+    /** Call stack for return addresses */
+    int call_stack[128];
+
+    /** Call stack pointer */
+    int csp;
+
 } VM;
 
 /**

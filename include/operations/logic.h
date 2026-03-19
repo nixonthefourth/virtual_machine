@@ -27,4 +27,28 @@ void op_lt(VM *vm);
  */
 void op_gt(VM *vm);
 
+/**
+ * @brief Logical AND. Pops two values, pushes 1 if both are non-zero, else 0.
+ *        Checks for stack underflow.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_and(VM *vm);
+
+/**
+ * @brief Logical OR. Pops two values, pushes 1 if either is non-zero, else 0.
+ *        Checks for stack underflow.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_or(VM *vm);
+
+/**
+ * @brief Logical NOT. Pops one value, pushes 1 if it was zero, else 0.
+ *        Checks for stack underflow.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_not(VM *vm);
+
 #endif //VIRTUAL_MACHINE_LOGIC_H

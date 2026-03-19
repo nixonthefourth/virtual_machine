@@ -12,14 +12,10 @@
  * @param vm The reference to the actual memory of the virtual machine.
  */
 void op_eq(VM *vm) {
-    // Check for stack underflow
     if (vm->sp < 2) {
         printf("Stack underflow\n");
         vm->running = 0;
-    }
-
-    // Successful Case
-    else {
+    } else {
         int b = pop(vm);
         int a = pop(vm);
         push(vm, a == b);
@@ -32,14 +28,10 @@ void op_eq(VM *vm) {
  * @param vm The reference to the actual memory of the virtual machine.
  */
 void op_lt(VM *vm) {
-    // Check for stack underflow
     if (vm->sp < 2) {
         printf("Stack underflow\n");
         vm->running = 0;
-    }
-
-    // Successful Case
-    else {
+    } else {
         int b = pop(vm);
         int a = pop(vm);
         push(vm, a < b);
@@ -52,16 +44,59 @@ void op_lt(VM *vm) {
  * @param vm The reference to the actual memory of the virtual machine.
  */
 void op_gt(VM *vm) {
-    // Check for stack underflow
     if (vm->sp < 2) {
         printf("Stack underflow\n");
         vm->running = 0;
-    }
-
-    // Successful Case
-    else {
+    } else {
         int b = pop(vm);
         int a = pop(vm);
         push(vm, a > b);
+    }
+}
+
+/**
+ * @brief Logical AND. Pops two values, pushes 1 if both are non-zero, else 0.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_and(VM *vm) {
+    if (vm->sp < 2) {
+        printf("Stack underflow\n");
+        vm->running = 0;
+    } else {
+        int b = pop(vm);
+        int a = pop(vm);
+        push(vm, (a != 0) && (b != 0));
+    }
+}
+
+/**
+ * @brief Logical OR. Pops two values, pushes 1 if either is non-zero, else 0.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_or(VM *vm) {
+    if (vm->sp < 2) {
+        printf("Stack underflow\n");
+        vm->running = 0;
+    } else {
+        int b = pop(vm);
+        int a = pop(vm);
+        push(vm, (a != 0) || (b != 0));
+    }
+}
+
+/**
+ * @brief Logical NOT. Pops one value, pushes 1 if it was zero, else 0.
+ *
+ * @param vm The reference to the actual memory of the virtual machine.
+ */
+void op_not(VM *vm) {
+    if (vm->sp == 0) {
+        printf("Stack underflow\n");
+        vm->running = 0;
+    } else {
+        int a = pop(vm);
+        push(vm, (a == 0) ? 1 : 0);
     }
 }
