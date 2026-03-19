@@ -1,6 +1,6 @@
 # C Virtual Machine
 
-A lightweight, **stack-based virtual machine** written in C (C11), featuring a custom instruction set, an interactive assembler, arithmetic, logic, control flow, registers, and a call stack — all built from scratch.
+A lightweight, stack-based virtual machine written in C (C11), featuring a custom instruction set, an interactive assembler, arithmetic, logic, control flow, registers, and a call stack – all built from scratch.
 
 ---
 
@@ -23,19 +23,19 @@ A lightweight, **stack-based virtual machine** written in C (C11), featuring a c
 
 ## Why a Stack-Based Architecture?
 
-Most CPUs you interact with every day are **register-based**: they shuffle values between a fixed set of named registers (like `eax`, `rbx`, etc.) before operating on them. A **stack-based VM** takes a different approach — operands are implicitly the top values on a stack, and instructions consume and produce values there.
+Most CPUs you interact with every day are register-based: they shuffle values between a fixed set of named registers (like `eax`, `rbx`, etc.) before operating on them. A stack-based VM takes a different approach: operands are implicitly the top values on a stack, and instructions consume and produce values there.
 
 This design was chosen deliberately for several reasons:
 
-**Simplicity of implementation.** There is no register-allocation problem to solve. Every opcode knows exactly where its inputs are (the top of the stack) and where to leave its output (back on the stack). The interpreter loop is a clean `switch` over a flat integer array — no complex decode stage needed.
+**Simplicity of implementation.** There is no register-allocation problem to solve. Every opcode knows exactly where its inputs are (the top of the stack) and where to leave its output (back on the stack). The interpreter loop is a clean `switch` over a flat integer array, hence no complex decode stage needed.
 
-**Simplicity of the instruction encoding.** Because operands are implicit, most instructions are a single word (one integer). Only instructions that need a literal value — `PUSH`, `JMP`, `LD`, `ST`, `CALL` — carry an extra word. This keeps bytecode compact and the assembler trivial to write.
+**Simplicity of the instruction encoding.** Because operands are implicit, most instructions are a single word (one integer). Only instructions that need a literal value — `PUSH`, `JMP`, `LD`, `ST`, `CALL` carry an extra word. This keeps bytecode compact and the assembler trivial to write.
 
-**Portability.** The entire VM state is a single `VM` struct holding plain `int` arrays. There are no platform-specific register intrinsics, no inline assembly, and no OS dependencies. The same code compiles and runs identically on Linux, macOS, and Windows.
+**Portability.** The entire VM state is a single `VM` struct holding plain `int` arrays. There are no platform-specific register intrinsics, no inline assembly, and no OS dependencies. The same code compiles and runs identically on Linux, macOS, and Windows thanks to CMake.
 
 **Pedagogical clarity.** Stack machines map directly onto how many high-level language expressions are naturally evaluated (postfix / reverse-Polish notation). The execution model is easy to reason about step-by-step, making this a good platform for learning how interpreters and compilers work.
 
-The trade-off is that stack machines can require more instructions than a register machine to express the same computation (e.g., `DUP` and `SWAP` are needed to reorder operands). For this project — a teaching and experimentation platform — that is an acceptable cost.
+The trade-off is that stack machines can require more instructions than a register machine to express the same computation (e.g., `DUP` and `SWAP` are needed to reorder operands). For this project, which is a teaching and experimentation, that is an acceptable cost.
 
 ---
 
@@ -90,7 +90,7 @@ vm/
 └── .gitignore
 ```
 
-Each operation category lives in its own translation unit. Adding a new opcode means touching only the relevant file plus a single `case` in `vm.c` — the rest of the codebase is unaffected.
+Each operation category lives in its own translation unit. Adding a new opcode means touching only the relevant file plus a single `case` in `vm.c` – the rest of the codebase is unaffected. This was achieved via a divide and conquer approach, where modules that don't have to know about each – don't know about each other. This separation of concerns allows for a simplified scalable design.
 
 ---
 
@@ -114,22 +114,22 @@ Source text typed at the prompt travels through three stages before execution:
   └───────────┘
        │
        ▼
-  ┌────────────────────────────────────────────┐
+  ┌─────────────────────────────────────────────┐
   │               VM — fetch / decode / execute │
   │                                             │
-  │  ┌─────────┐   ┌──────────┐   ┌──────────┐ │
-  │  │  FETCH  │──▶│  DECODE  │──▶│ EXECUTE  │ │
-  │  │ ip++    │   │ switch() │   │ op_*()   │ │
-  │  └─────────┘   └──────────┘   └──────────┘ │
-  │        ▲                            │        │
-  │        └────────────────────────────┘        │
-  │                (loop until HALT)             │
-  └────────────────────────────────────────────┘
+  │  ┌─────────┐   ┌──────────┐   ┌──────────┐  │
+  │  │  FETCH  │──▶│  DECODE  │──▶│ EXECUTE  │  │
+  │  │ ip++    │   │ switch() │   │ op_*()   │  │
+  │  └─────────┘   └──────────┘   └──────────┘  │
+  │        ▲                            │       │
+  │        └────────────────────────────┘       │
+  │                (loop until HALT)            │
+  └─────────────────────────────────────────────┘
 ```
 
 ### VM State
 
-The complete runtime state is a single struct — no globals, no hidden singletons:
+The complete runtime state is a single struct; no globals, no hidden singletons:
 
 ```c
 typedef struct {
@@ -361,11 +361,11 @@ The VM detects runtime errors, prints a message, and halts cleanly — it never 
 
 To add a new opcode, follow these five steps:
 
-1. **Declare the opcode** — add a constant to the `enum` in `include/vm.h`.
-2. **Implement the handler** — write `void op_yourname(VM *vm)` in the appropriate file under `src/operations/`, or create a new one.
-3. **Declare the handler** — add the prototype to the corresponding header in `include/operations/`.
-4. **Register it** — add a `case YOUR_OPCODE: { op_yourname(vm); break; }` to the `switch` in `src/vm.c`.
-5. **Expose it to the assembler** — add a `{ "YOURNAME", YOUR_OPCODE, operand_count }` row to `MNEMONIC_TABLE` in `src/io/assembler.c`.
+1. **Declare the opcode** – add a constant to the `enum` in `include/vm.h`.
+2. **Implement the handler** – write `void op_yourname(VM *vm)` in the appropriate file under `src/operations/`, or create a new one.
+3. **Declare the handler** – add the prototype to the corresponding header in `include/operations/`.
+4. **Register it** – add a `case YOUR_OPCODE: { op_yourname(vm); break; }` to the `switch` in `src/vm.c`.
+5. **Expose it to the assembler** – add a `{ "YOURNAME", YOUR_OPCODE, operand_count }` row to `MNEMONIC_TABLE` in `src/io/assembler.c`.
 
 The REPL and assembler will pick it up automatically — no other changes required.
 
@@ -374,7 +374,7 @@ The REPL and assembler will pick it up automatically — no other changes requir
 ## Roadmap
 
 - [ ] Save and load programs as `.txt` files
-- [ ] SFML visual debugger / step-through interface
+- [ ] SFML visual interface
 - [ ] LaTeX paper documenting the architecture
 
 ---
