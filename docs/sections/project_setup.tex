@@ -22,9 +22,13 @@ In order to run the project either the IDE can handle the runtime, or the projec
     ./vm
 \end{lstlisting}
 
-\begin{figure}
+\begin{figure}[H]
 \subsection{File Directory}
 \centering
 \includegraphics[width=0.8\textwidth]{assets/directory.png}
 \caption{File Directory of the project}
 \end{figure}
+
+\subsection{Separation of Concerns}
+
+Each operation category lives in its own translation unit. Adding a new opcode means touching only the relevant file plus a single case in vm.c – the rest of the codebase is unaffected. This was achieved via a divide and conquer approach, where modules that don't have to know about each other – don't know about each other. This separation of concerns allows for a simplified scalable design.

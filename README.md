@@ -98,7 +98,7 @@ vm/
 └── .gitignore
 ```
 
-Each operation category lives in its own translation unit. Adding a new opcode means touching only the relevant file plus a single `case` in `vm.c` – the rest of the codebase is unaffected. This was achieved via a divide and conquer approach, where modules that don't have to know about each – don't know about each other. This separation of concerns allows for a simplified scalable design.
+Each operation category lives in its own translation unit. Adding a new opcode means touching only the relevant file plus a single `case` in `vm.c` – the rest of the codebase is unaffected. This was achieved via a divide and conquer approach, where modules that don't have to know about each other – don't know about each other. This separation of concerns allows for a simplified scalable design.
 
 ---
 
