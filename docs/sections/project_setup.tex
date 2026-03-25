@@ -1,9 +1,9 @@
 \section{Project Setup}
-\subsection{Prerequisites}
+\subsection*{Prerequisites}
 
 The project used CMake 4.1 and C11 standards for CLang in its setup. However, in order to run the project on any computer, it should have installed dependencies such as: GCC/CLang with C11 support. GNUMake is required for CMake build on Linux, however CMake can be comfortbaly ran from both Mac and Windows. This document recommends using environments such as Visual Studio for Windows, and CLion for Mac and Linux.
 
-\subsection{Build}
+\subsection*{Build}
 
 In order to build the project from terminal, this command can be pasted into the terminal with the set directory of the project:
 
@@ -23,12 +23,12 @@ In order to run the project either the IDE can handle the runtime, or the projec
 \end{lstlisting}
 
 \begin{figure}[H]
-\subsection{File Directory}
+\subsection*{File Directory}
 \centering
 \includegraphics[width=0.8\textwidth]{assets/directory.png}
 \caption{File Directory of the project}
 \end{figure}
 
-\subsection{Separation of Concerns}
+\subsection*{Separation of Concerns}
 
 Each operation category lives in its own translation unit. Adding a new opcode means touching only the relevant file plus a single case in vm.c – the rest of the codebase is unaffected. This was achieved via a divide and conquer approach, where modules that don't have to know about each other – don't know about each other. This separation of concerns allows for a simplified scalable design.
