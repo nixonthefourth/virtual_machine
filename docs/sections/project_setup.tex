@@ -1,0 +1,29 @@
+\section{Project Setup}
+\subsection{Prerequisites}
+
+The project used CMake 4.1 and C11 standards for CLang in its setup. However, in order to run the project on any computer, it should have installed dependencies such as: GCC/CLang with C11 support. GNUMake is required for CMake build on Linux, however CMake can be comfortbaly ran from both Mac and Windows. This document recommends using environments such as Visual Studio for Windows, and CLion for Mac and Linux.
+
+\subsection{Build}
+
+In order to build the project from terminal, this command can be pasted into the terminal with the set directory of the project:
+
+\begin{lstlisting}[language=bash]
+gcc -std=c11 -Wall -Wextra -Iinclude \
+    src/main.c src/vm.c \
+    src/io/lexer.c src/io/assembler.c \
+    src/operations/maths.c src/operations/stack.c \
+    src/operations/flow.c src/operations/logic.c \
+    src/operations/registers.c \
+    -o vm
+\end{lstlisting}
+
+In order to run the project either the IDE can handle the runtime, or the project can be ran via the following command:
+\begin{lstlisting}[language=bash]
+    ./vm
+\end{lstlisting}
+
+\subsection{directory}
+
+\begin{lstlisting}[language=bash]
+    
+\end{lstlisting}

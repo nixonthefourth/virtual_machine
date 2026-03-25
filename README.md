@@ -61,6 +61,14 @@ The trade-off is that stack machines can require more instructions than a regist
 
 ```
 vm/
+├── docs/
+│   ├── sections/
+│   │   ├── abstract.tex
+│   │   └── project_setup.tex
+│   │
+│   ├── main.tex
+│   └── main.pdf
+│
 ├── src/
 │   ├── main.c                 # Interactive REPL entry point
 │   ├── vm.c                   # Fetch-decode-execute loop; push/pop primitives
