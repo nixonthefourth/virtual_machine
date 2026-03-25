@@ -2,6 +2,8 @@
 
 A lightweight, stack-based virtual machine written in C (C11), featuring a custom instruction set, an interactive assembler, arithmetic, logic, control flow, registers, and a call stack – all built from scratch.
 
+Please look into `docs/main.pdf` for the paper explaining the reasoning behind this project in more detail.
+
 ---
 
 ## Table of Contents
