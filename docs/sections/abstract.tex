@@ -1,4 +1,17 @@
 \section{Abstract}
 
-This project outlines a stack-based virtual machine. Built from ground-up from C (C11 standard). The machine allows for 25 opcodes including operations such as: arithmetic, logic, control flow, functions, stack manipulations, call stack and register operations. The primary motivation for developing this project was curiosity and investigation of both virtual machine design and under-the-hood operations of CPUs and programming languages.
+This project outlines a stack-based virtual machine. Built from ground-up from C (C11 standard). The machine allows for 25 opcodes including operations such as: arithmetic, logic, control flow, functions, stack manipulations, call stack and register operations; the project also contains a built-in development environment (REPL) in terminal with four built-in features: code compilation, comments, opcode reference and an array index list. The REPL features don't affect operations performed in the virtual machine, rather documents those. 
 
+The primary motivation for developing this project was curiosity-driven investigation of both virtual machine design and under-the-hood operations of CPUs and programming languages.
+
+Most CPUs one interacts with every day are register-based: they shuffle values between a fixed set of named registers (like \texttt{eax}, \texttt{rbx }etc.) before operating on them. A stack-based VM takes a different approach: operands are implicitly the top values on a stack, and instructions consume and produce values there.
+
+This design was chosen deliberately for several reasons:
+\begin{itemize}
+    \item \textbf{Simplicity} of implementation: There is no register-allocation problem to solve. Every opcode knows exactly where its inputs are (the top of the stack) and where to leave its output (back on the stack). The interpreter loop is a clean switch over a flat integer array, hence no complex decode stage needed.
+    \item \textbf{Simplicity} of the instruction encoding: Since operands are implicit, most instructions are a single word (one integer). Only instructions that need a literal value – \texttt{PUSH}, \texttt{JMP}, \texttt{LD}, \texttt{ST}, \texttt{CALL} carry an extra word. This keeps bytecode compact and the assembler trivial to write.
+    \item \textbf{Portability}: The entire VM state is a single artificial data structure holding plain integer arrays. There are no platform-specific register intrinsics, no inline assembly, and no OS dependencies. The same code compiles and runs identically on Linux, macOS, and Windows due to application of CMake.
+    \item \textbf{Pedagogical clarity}: Stack machines map directly onto how many high-level language expressions are naturally evaluated (postfix / reverse-Polish notation). The execution model is easy to reason about step-by-step, making this a good platform for learning how interpreters and compilers work.
+\end{itemize}
+
+The trade-off is that stack machines can require more instructions than a register machine to express the same computation (e.g., \texttt{DUP} and \texttt{SWAP} are needed to reorder operands). This follows a similar idea of RISC CPU architecture, where the instruciton set is reduced for notably smaller and more energy-efficient CPUs. For this project, which is a teaching and experimentation, that is an acceptable cost.
