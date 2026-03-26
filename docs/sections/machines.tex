@@ -12,7 +12,7 @@ The JVM also compiles to native machine code at runtime via a Just-In-Time (JIT)
 
 \subsection{CPython}
 
-CPython — the reference implementation of Python — uses a stack-based bytecode interpreter that is structurally very similar to the one built here. Python source is compiled to \texttt{.pyc} bytecode files, which are then interpreted by a central \texttt{switch} loop in \texttt{ceval.c}. That loop, like \texttt{vm\_run} in this project, dispatches on an integer opcode and calls the appropriate handler.
+CPython, the reference implementation of Python, uses a stack-based bytecode interpreter that is structurally very similar to the one built here. Python source is compiled to \texttt{.pyc} bytecode files, which are then interpreted by a central \texttt{switch} loop in \texttt{ceval.c}. That loop, like \texttt{vm\_run} in this project, dispatches on an integer opcode and calls the appropriate handler.
 
 The most striking difference is complexity of state. CPython's evaluation frame carries not just an operand stack and an instruction pointer, but also a reference to the local variable array, the enclosing global and builtin namespaces, the current exception state, and enough metadata to produce meaningful tracebacks on error. This project's \texttt{VM} struct is around ten fields; CPython's \texttt{\_PyInterpreterFrame} has closer to twenty, each backed by a rich object system.
 
@@ -22,9 +22,9 @@ CPython also uses reference counting with a cycle-detecting garbage collector to
 
 WebAssembly (Wasm) is a binary instruction format designed as a portable compilation target for languages like C, C++, and Rust. Its execution model is stack-based in the same sense as this project and the JVM: instructions implicitly consume and produce values on a virtual stack. A Wasm \texttt{i32.add} instruction is semantically equivalent to this project's \texttt{ADD}.
 
-What sets Wasm apart is its formal specification. Every aspect of the execution model — the type system, the stack discipline, the memory model, the trap conditions — is defined in a mathematical notation that admits formal proof. The Wasm type system is strong enough that a compliant Wasm engine can verify a module's safety in a single linear pass before executing a single instruction. In contrast, this project has no type system and no static verification phase: a program that pushes a register index as data and then jumps to it as an address will execute without complaint.
+What sets Wasm apart is its formal specification. Every aspect of the execution model – the type system, the stack discipline, the memory model, the trap conditions — is defined in a mathematical notation that admits formal proof. The Wasm type system is strong enough that a compliant Wasm engine can verify a module's safety in a single linear pass before executing a single instruction. In contrast, this project has no type system and no static verification phase: a program that pushes a register index as data and then jumps to it as an address will execute without complaint.
 
-Wasm also defines a \textit{linear memory} model — a flat, byte-addressable array that the guest program can read and write with load and store instructions. This project's memory model is the operand stack and sixteen integer registers; there is no byte-addressable heap. Adding a memory model analogous to Wasm's linear memory would be the most significant architectural extension possible within the existing design.
+Wasm also defines a \textit{linear memory} model – a flat, byte-addressable array that the guest program can read and write with load and store instructions. This project's memory model is the operand stack and sixteen integer registers; there is no byte-addressable heap. Adding a memory model analogous to Wasm's linear memory would be the most significant architectural extension possible within the existing design.
 
 \subsection{Summary of Differences}
 
