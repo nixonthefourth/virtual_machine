@@ -64,7 +64,14 @@ The trade-off is that stack machines can require more instructions than a regist
 ```
 vm/
 ├── docs/
+│   ├── assets/
+│   │   └── directory.png
+│   │
 │   ├── sections/
+│   │   ├── conclusions.tex
+│   │   ├── implementation_notes.tex
+│   │   ├── instruction_set.tex
+│   │   ├── machines.tex
 │   │   ├── abstract.tex
 │   │   └── project_setup.tex
 │   │

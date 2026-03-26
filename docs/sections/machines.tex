@@ -1,0 +1,51 @@
+\section{Comparison with Real-World Virtual Machines}
+
+The VM described in this paper does not exist in a vacuum. Stack-based virtual machines are one of the most studied and widely deployed software artefacts in computing — the Java Virtual Machine has executed production code since 1995, CPython's bytecode interpreter underpins virtually all Python in the world, and WebAssembly has introduced a new formally specified VM into every modern web browser. Situating this project against those systems clarifies which design choices are universal and which are specific to the constraints and goals of this implementation.
+
+\subsection{The Java Virtual Machine}
+
+The JVM is perhaps the closest spiritual relative of the VM built here. It is explicitly stack-based: the JVM specification defines an operand stack per stack frame, and most bytecode instructions implicitly read from and write to the top of that stack. The \texttt{iadd} instruction, for example, pops two integers and pushes their sum — identical in semantics to this project's \texttt{ADD}.
+
+The differences are instructive. The JVM operates on \textit{typed} values: its operand stack is not a flat array of integers but a sequence of typed slots, and the bytecode verifier statically checks that no instruction is ever applied to a value of the wrong type before the program begins executing. This project's VM is entirely untyped — every value is a plain C \texttt{int}, and there is no mechanism to distinguish a boolean, a character, or a pointer from an arithmetic result. The simplification is appropriate for a teaching tool but would be the first thing to address in a production system.
+
+The JVM also compiles to native machine code at runtime via a Just-In-Time (JIT) compiler, which profiles hot code paths and replaces the interpreter loop with optimised native instructions. This project interprets every instruction individually, which is simpler to implement and reason about but substantially slower for compute-intensive programs. The gap between a naive interpreter and a JIT-compiled loop is typically one to two orders of magnitude on arithmetic-heavy workloads.
+
+\subsection{CPython}
+
+CPython — the reference implementation of Python — uses a stack-based bytecode interpreter that is structurally very similar to the one built here. Python source is compiled to \texttt{.pyc} bytecode files, which are then interpreted by a central \texttt{switch} loop in \texttt{ceval.c}. That loop, like \texttt{vm\_run} in this project, dispatches on an integer opcode and calls the appropriate handler.
+
+The most striking difference is complexity of state. CPython's evaluation frame carries not just an operand stack and an instruction pointer, but also a reference to the local variable array, the enclosing global and builtin namespaces, the current exception state, and enough metadata to produce meaningful tracebacks on error. This project's \texttt{VM} struct is around ten fields; CPython's \texttt{\_PyInterpreterFrame} has closer to twenty, each backed by a rich object system.
+
+CPython also uses reference counting with a cycle-detecting garbage collector to manage heap-allocated objects. This project allocates nothing on the heap at runtime: all VM state lives in the \texttt{VM} struct on the C stack, and values are plain integers. The absence of heap allocation and garbage collection is both the biggest simplification and the biggest limitation — the VM cannot represent strings, arrays, or any data structure larger than a single integer.
+
+\subsection{WebAssembly}
+
+WebAssembly (Wasm) is a binary instruction format designed as a portable compilation target for languages like C, C++, and Rust. Its execution model is stack-based in the same sense as this project and the JVM: instructions implicitly consume and produce values on a virtual stack. A Wasm \texttt{i32.add} instruction is semantically equivalent to this project's \texttt{ADD}.
+
+What sets Wasm apart is its formal specification. Every aspect of the execution model — the type system, the stack discipline, the memory model, the trap conditions — is defined in a mathematical notation that admits formal proof. The Wasm type system is strong enough that a compliant Wasm engine can verify a module's safety in a single linear pass before executing a single instruction. In contrast, this project has no type system and no static verification phase: a program that pushes a register index as data and then jumps to it as an address will execute without complaint.
+
+Wasm also defines a \textit{linear memory} model — a flat, byte-addressable array that the guest program can read and write with load and store instructions. This project's memory model is the operand stack and sixteen integer registers; there is no byte-addressable heap. Adding a memory model analogous to Wasm's linear memory would be the most significant architectural extension possible within the existing design.
+
+\subsection{Summary of Differences}
+
+\begin{center}
+\begin{tabular}{lllll}
+\toprule
+\textbf{Property} & \textbf{This VM} & \textbf{JVM} & \textbf{CPython} & \textbf{Wasm} \\
+\midrule
+Architecture          & Stack-based   & Stack-based   & Stack-based   & Stack-based \\
+Value types           & \texttt{int} only & Typed slots & Python objects & i32/i64/f32/f64 \\
+Static verification   & None          & Bytecode verifier & None        & Full type check \\
+Execution model       & Interpreted   & JIT compiled  & Interpreted   & Interpreted / JIT \\
+Memory model          & Stack + 16 regs & Heap (GC)   & Heap (RC + GC) & Linear memory \\
+Heap allocation       & None          & Yes (GC)      & Yes (RC)      & Yes (manual) \\
+Call frames           & Single shared stack & Per-frame stack & Per-frame + locals & Per-frame stack \\
+External dependencies & None          & JDK runtime   & CPython runtime & Host environment \\
+Lines of C source     & $\sim$600     & $\sim$350,000 & $\sim$500,000 & varies \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The table makes clear that this project occupies the simplest possible position on almost every axis. That is not a shortcoming — it is the consequence of optimising for a different goal. The JVM, CPython, and Wasm are each production systems that must handle untrusted code safely, integrate with large ecosystems, and deliver competitive performance. This VM must be readable, buildable in a single \texttt{gcc} invocation, and small enough that every design decision can be explained in a short paper. On those criteria it succeeds completely.
+
+The shared stack-based execution model across all four systems also demonstrates something more fundamental: the stack machine is not merely a pedagogical device. It is a genuinely useful abstraction that real-world language designers and standards bodies have independently converged on, because its simplicity of specification and implementation outweighs the cost of the occasional extra \texttt{DUP} instruction.

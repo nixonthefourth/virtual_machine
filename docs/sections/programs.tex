@@ -1,0 +1,286 @@
+\section{Example Programs}
+
+This section presents a series of complete programs written for the VM, arranged in order of increasing complexity. Each example is self-contained: it can be typed into the interactive REPL exactly as shown and will produce the stated output. The intent is to demonstrate not just individual opcodes in isolation, but the idiomatic patterns that emerge when combining them — loops, conditionals, register-based storage, and function calls.
+
+\subsection{Arithmetic Expressions}
+
+The simplest programs evaluate arithmetic expressions and print their result. Because the VM uses a stack, all expressions are written in postfix (Reverse Polish) order: operands are pushed first, then the operator is applied.
+
+\subsubsection*{Computing $(3 + 4) \times 5$}
+
+\begin{lstlisting}
+PUSH 3
+PUSH 4
+ADD         ; stack: 7
+PUSH 5
+MULT        ; stack: 35
+PRINT       ; prints 35
+HALT
+\end{lstlisting}
+
+Output: \texttt{35}
+
+\subsubsection*{Integer division with remainder}
+
+The following program computes both the quotient and the remainder of $17 \div 5$ in a single pass, using \texttt{DUP} to avoid pushing the operands twice.
+
+\begin{lstlisting}
+PUSH 17
+PUSH 5
+DUP         ; stack: 17 5 5
+ST 0        ; save divisor in R0 - stack: 17 5
+DIV         ; stack: 3   (quotient)
+PRINT       ; prints 3
+PUSH 17
+LD 0        ; reload divisor - stack: 17 5
+MOD         ; stack: 2   (remainder)
+PRINT       ; prints 2
+HALT
+\end{lstlisting}
+
+Output: \texttt{3}, \texttt{2}
+
+\subsection{Conditional Execution}
+
+Conditional logic is expressed by combining a comparison opcode (\texttt{EQ}, \texttt{LT}, \texttt{GT}) with a conditional branch (\texttt{JZ} or \texttt{JNZ}). The comparison leaves a boolean (0 or 1) on the stack, which the branch then consumes.
+
+\subsubsection*{Absolute value}
+
+The program reads a value (hard-coded here as $-7$) and prints its absolute value.
+
+\begin{lstlisting}
+PUSH -7
+DUP         ; keep a copy for the sign check - stack: -7 -7
+PUSH 0
+LT          ; is -7 < 0? pushes 1 - stack: -7 1
+JZ 10       ; if not negative, jump to PRINT (word 10)
+PUSH -1
+MULT        ; negate: -7 * -1 = 7 - stack: 7
+PRINT       ; word 10: print result
+HALT
+\end{lstlisting}
+
+Output: \texttt{7}
+
+Note that the \texttt{PRINT} at word 10 is reached by two paths: the fall-through path (after the negation) and the direct jump (when the value was already non-negative). The two-word \texttt{MULT} instruction occupies words 8--9, so \texttt{PRINT} lands at word 10.
+
+\subsubsection*{Maximum of two values}
+
+\begin{lstlisting}
+PUSH 14
+PUSH 9
+DUP         ; stack: 14 9 9
+ST 0        ; save second value - stack: 14 9
+GT          ; is 14 > 9? pushes 1 - stack: 1
+JNZ 12      ; if yes, jump to PRINT_A (word 12)
+LD 0        ; otherwise load the second value
+PRINT       ; print 9
+HALT
+
+; --- word 12 ---
+PUSH 14     ; reload first value
+PRINT       ; print 14
+HALT
+\end{lstlisting}
+
+Output: \texttt{14}
+
+\subsection{Loops}
+
+All loops in the VM are built from a backward \texttt{JMP} combined with a conditional branch that exits when the loop condition is no longer satisfied.
+
+\subsubsection*{Countdown from 5 to 1}
+
+\begin{lstlisting}
+PUSH 5          ; word 0: initial counter
+
+; --- loop body (word 2) ---
+DUP             ; word 2: duplicate for PRINT
+PRINT           ; word 3: print current value
+PUSH 1          ; word 4: decrement
+SUB             ; word 6: counter - 1
+DUP             ; word 7: duplicate for exit test
+JZ 12           ; word 8: exit if counter reached 0
+JMP 2           ; word 10: loop back
+
+; --- word 12 ---
+POP             ; discard the final 0
+HALT
+\end{lstlisting}
+
+Output: \texttt{5}, \texttt{4}, \texttt{3}, \texttt{2}, \texttt{1}
+
+After the last decrement the counter reaches zero. \texttt{DUP} leaves a copy for \texttt{JZ}, which jumps to the \texttt{POP} at word 12, discarding the zero before \texttt{HALT}.
+
+\subsubsection*{Summing 1 to $N$}
+
+This program accumulates the sum $1 + 2 + \cdots + N$ into register R1.
+
+\begin{lstlisting}
+PUSH 10
+ST 0            ; R0 = N = 10
+PUSH 0
+ST 1            ; R1 = accumulator = 0
+PUSH 1
+ST 2            ; R2 = counter = 1
+
+; --- loop body (word 12) ---
+LD 2            ; push counter
+LD 1            ; push accumulator
+ADD             ; accumulator + counter
+ST 1            ; store updated accumulator
+LD 2            ; push counter
+PUSH 1
+ADD             ; counter + 1
+ST 2            ; store updated counter
+LD 2            ; push counter
+LD 0            ; push N
+GT              ; counter > N?
+JNZ 12          ; if not, repeat
+LD 1            ; push final sum
+PRINT           ; prints 55
+HALT
+\end{lstlisting}
+
+Output: \texttt{55}
+
+\subsection{Functions}
+
+The \texttt{CALL} and \texttt{RET} instructions support structured function calls. By convention, arguments are pushed by the caller before \texttt{CALL} and the return value is left on the operand stack by the callee before \texttt{RET}.
+
+\subsubsection*{Squaring a number}
+
+The function at word 6 pops one argument, squares it, and returns the result.
+
+\begin{lstlisting}
+; --- caller ---
+PUSH 9          ; word 0: argument
+CALL 6          ; word 2: call square(); return addr = word 4
+PRINT           ; word 4: print return value (81)
+HALT            ; word 5
+
+; --- square(a): a^2 - starts at word 6 ---
+DUP             ; word 6: a a
+MULT            ; word 7: a*a
+RET             ; word 8
+\end{lstlisting}
+
+Output: \texttt{81}
+
+\subsubsection*{Recursive factorial}
+
+The following program computes $5!$ using a recursive function. The factorial function calls itself for $n > 1$ and returns 1 as the base case for $n \leq 1$.
+
+\begin{lstlisting}
+; --- caller ---
+PUSH 5          ; word 0
+CALL 6          ; word 2: call fact(); return addr = word 4
+PRINT           ; word 4
+HALT            ; word 5
+
+; --- fact(n) - starts at word 6 ---
+DUP             ; word 6:  n n
+PUSH 1
+GT              ; word 8:  n (n>1)?
+JZ 22           ; word 10: if n<=1 jump to base case (word 22)
+
+; recursive case
+DUP             ; word 12: n n
+PUSH 1
+SUB             ; word 14: n (n-1)
+CALL 6          ; word 16: fact(n-1); return addr = word 18
+MULT            ; word 18: n * fact(n-1)
+RET             ; word 19
+
+; base case (word 22): n is on the stack, value is 1
+POP             ; word 22: discard n
+PUSH 1          ; push 1
+RET             ; word 24
+\end{lstlisting}
+
+Output: \texttt{120}
+
+Each recursive call saves a return address on the call stack and leaves the partial result on the operand stack. When the base case fires, the chain of \texttt{MULT} operations unwinds, accumulating $5 \times 4 \times 3 \times 2 \times 1 = 120$.
+
+\subsection{Register-Based Patterns}
+
+Registers shine in programs where values must survive multiple stack operations without being continuously re-pushed. The examples below illustrate two common idioms.
+
+\subsubsection*{Swapping two values via a register}
+
+\begin{lstlisting}
+PUSH 42
+PUSH 99
+ST 0            ; R0 = 99
+                ; stack: 42
+ST 1            ; R1 = 42
+                ; stack: (empty)
+LD 0            ; push 99
+LD 1            ; push 42
+PRINT           ; prints 42
+PRINT           ; prints 99
+HALT
+\end{lstlisting}
+
+Output: \texttt{42}, \texttt{99}
+
+\subsubsection*{Loop with a persistent accumulator}
+
+The Fibonacci sequence up to the $N$-th term demonstrates the register idiom for carrying state across loop iterations. Two registers hold the two previous terms; a third holds the loop counter.
+
+\begin{lstlisting}
+PUSH 0
+ST 0            ; R0 = F(0) = 0
+PUSH 1
+ST 1            ; R1 = F(1) = 1
+PUSH 8
+ST 2            ; R2 = remaining iterations
+
+LD 0
+PRINT           ; print F(0) = 0
+LD 1
+PRINT           ; print F(1) = 1
+
+; --- loop (word 18) ---
+LD 0
+LD 1
+ADD             ; F(n) = F(n-1) + F(n-2)
+ST 3            ; R3 = new term
+LD 1
+ST 0            ; R0 = old F(n-1)
+LD 3
+ST 1            ; R1 = new F(n)
+LD 3
+PRINT           ; print new term
+LD 2
+PUSH 1
+SUB
+ST 2            ; decrement counter
+LD 2
+JNZ 18          ; repeat if counter > 0
+HALT
+\end{lstlisting}
+
+Output: \texttt{0}, \texttt{1}, \texttt{1}, \texttt{2}, \texttt{3}, \texttt{5}, \texttt{8}, \texttt{13}, \texttt{21}, \texttt{34}
+
+\subsection{Patterns and Idioms Summary}
+
+The examples above recur throughout non-trivial VM programs. The table below collects the most useful idioms for quick reference.
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+\textbf{Goal} & \textbf{Idiom} \\
+\midrule
+Test top of stack without consuming it     & \texttt{DUP} before comparison \\
+Loop back unconditionally                  & \texttt{JMP <loop-start>} \\
+Exit a loop when counter reaches zero      & \texttt{DUP / JZ <exit>} \\
+Pass an argument to a function             & \texttt{PUSH <val> / CALL <addr>} \\
+Return a value from a function             & Leave it on the stack before \texttt{RET} \\
+Save a value across stack operations       & \texttt{ST <reg>} then \texttt{LD <reg>} \\
+Negate a boolean result                    & \texttt{NOT} \\
+Implement $a \leq b$                       & \texttt{GT NOT} \\
+Implement $a \neq b$                       & \texttt{EQ NOT} \\
+\bottomrule
+\end{tabular}
+\end{center}

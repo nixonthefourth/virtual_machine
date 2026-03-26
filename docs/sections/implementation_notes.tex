@@ -1,0 +1,148 @@
+\section{Implementation Notes}
+
+This section examines a selection of non-obvious decisions made during the implementation: why certain things were designed the way they were, where the current code contains latent defects, and what the consequences of those choices are at runtime. The intent is not to enumerate every line of code, but to highlight the points where the implementation departs from a naive first approach and the points where it does not yet go far enough.
+
+\subsection{The \texttt{push} and \texttt{pop} Primitives}
+
+A key architectural decision is that \texttt{push} and \texttt{pop} live in \texttt{vm.c} rather than in any operation module. Every handler in \texttt{maths.c}, \texttt{logic.c}, and so on calls these two functions rather than manipulating \texttt{vm->sp} directly. This centralises the overflow and underflow checks in exactly one place each, which means a bug in the bounds check — or a future change to the stack size — needs to be fixed in a single location.
+
+The underflow guard in \texttt{pop} deserves particular attention:
+
+\begin{lstlisting}[language=C]
+int pop(VM *vm) {
+    if (vm->sp == 0) {
+        printf("Stack underflow\n");
+        vm->running = 0;
+        return 0;
+    }
+    return vm->stack[--vm->sp];
+}
+\end{lstlisting}
+
+When underflow is detected, the function sets \texttt{running = 0} \textit{and} returns \texttt{0}. Returning a sentinel is necessary because \texttt{pop} has a non-void return type: the caller will assign the result to a local variable regardless. Returning \texttt{0} instead of leaving the variable uninitialised prevents undefined behaviour in the caller, even though the VM will halt before that value is used again. This is a deliberate defensive choice.
+
+\subsection{A Latent Bug in \texttt{op\_div}}
+
+The division handler in \texttt{maths.c} contains a structural defect that is worth examining in detail, because it illustrates a class of error that arises whenever error-handling and computation are interleaved without \texttt{else} guards:
+
+\begin{lstlisting}[language=C]
+void op_div(VM *vm) {
+    if (vm->sp < 2) {
+        printf("Stack underflow\n");
+        vm->running = 0;
+    }
+
+    int b = pop(vm);        // (1)
+
+    if (b == 0) {
+        printf("Division by zero, error\n");
+        vm->running = 0;
+    }
+
+    int a = pop(vm);        // (2)
+    push(vm, a / b);        // (3)
+}
+\end{lstlisting}
+
+There are two problems here. First, the underflow check at the top sets \texttt{running = 0} but does not \texttt{return}. Execution falls through to line (1), which calls \texttt{pop} on a stack that may have zero or one element. The \texttt{pop} call will detect underflow a second time and return \texttt{0}, but this double-fault produces two error messages and leaves the function executing further than it should.
+
+Second, the division-by-zero check at the middle similarly has no \texttt{return}. When \texttt{b == 0}, the VM is halted but execution continues: \texttt{a} is popped at line (2) and \texttt{a / b} is evaluated at line (3). In C, integer division by zero is \textit{undefined behaviour} — the compiler is permitted to generate any code it likes, including a program crash or a silent wrong answer. The fact that \texttt{running} has already been set to \texttt{0} does not protect against this: the undefined behaviour occurs at the point of the division, before the loop in \texttt{vm\_run} has a chance to check the flag.
+
+The correct implementation uses \texttt{else} branches and early \texttt{return}s to ensure these paths are mutually exclusive:
+
+\begin{lstlisting}[language=C]
+void op_div(VM *vm) {
+    if (vm->sp < 2) {
+        printf("Stack underflow\n");
+        vm->running = 0;
+        return;
+    }
+    int b = pop(vm);
+    if (b == 0) {
+        printf("Division by zero\n");
+        vm->running = 0;
+        return;
+    }
+    int a = pop(vm);
+    push(vm, a / b);
+}
+\end{lstlisting}
+
+Every other arithmetic handler (\texttt{op\_add}, \texttt{op\_sub}, \texttt{op\_mult}, \texttt{op\_mod}) uses a proper \texttt{if/else} structure and is not affected by this issue.
+
+\subsection{A Latent Bug in \texttt{op\_store}}
+
+The register store handler has an analogous problem:
+
+\begin{lstlisting}[language=C]
+void op_store(VM *vm) {
+    int reg = vm->program[vm->ip++];
+
+    if (reg < 0 || reg >= 16) {
+        printf("Invalid register: %d\n", reg);
+        vm->running = 0;
+    }
+
+    if (vm->sp == 0) {
+        printf("Stack underflow\n");
+        vm->running = 0;
+    }
+
+    vm->registers[reg] = pop(vm);   // always reached
+}
+\end{lstlisting}
+
+Neither error check is followed by a \texttt{return}. If the register index is invalid, execution continues to the \texttt{pop} and then to the array write \texttt{vm->registers[reg]}, which is an out-of-bounds write — undefined behaviour with potential memory corruption. If the stack is empty, \texttt{pop} returns its sentinel \texttt{0} and the (possibly invalid) register is written anyway.
+
+The counterpart \texttt{op\_load} handles this correctly with an \texttt{else} clause, so the inconsistency between the two register operations is likely an oversight rather than a design choice.
+
+\subsection{Flat Integer Bytecode}
+
+Programs are stored as plain \texttt{int} arrays. Opcodes and operands share the same representation; the only distinction between an opcode word and a data word is positional context — the VM knows from the mnemonic table how many words following an opcode are operands rather than the next instruction.
+
+This encoding is extremely simple to generate (the assembler is around 60 lines of C) and simple to execute (the fetch stage is a single array index). The cost is that the bytecode is not self-describing: there is no way to scan the array and determine instruction boundaries without executing from the start. A disassembler, for instance, would need to replicate the same operand-count table used by the assembler.
+
+A more conventional approach would encode the operand count into the opcode word itself — for example, using the high 16 bits for the opcode and the low 16 bits for an immediate value. This would allow random-access disassembly but would complicate the fetch loop. For a VM of this scale, the flat array is the right trade-off.
+
+\subsection{Zero-Initialisation of the VM Struct}
+
+Every REPL session creates a fresh VM with:
+
+\begin{lstlisting}[language=C]
+VM vm = {0};
+\end{lstlisting}
+
+The \texttt{= \{0\}} initialiser is a C11 idiom that zero-initialises every field of the struct: \texttt{sp}, \texttt{ip}, \texttt{csp}, all 256 stack slots, all 16 registers, and all 128 call stack slots. This matters for correctness in two ways. First, \texttt{sp = 0} and \texttt{ip = 0} mean the stack and instruction pointer are in valid starting states without any explicit assignment. Second, all 16 registers are initialised to zero, which matches the documented behaviour that "registers hold their values across instructions and are initialised to zero at VM startup." An uninitialised struct would contain whatever happened to be in that stack frame's memory, producing non-deterministic register reads.
+
+\subsection{Separation of the Operand and Call Stacks}
+
+A common simplification in toy VM implementations is to use a single stack for both operands and return addresses, with \texttt{CALL} pushing the return address onto the operand stack and \texttt{RET} popping it. This VM uses two completely separate arrays instead: \texttt{stack[256]} for operands and \texttt{call\_stack[128]} for return addresses, each with its own pointer (\texttt{sp} and \texttt{csp}).
+
+The two-stack design has a concrete correctness advantage: a function's return address cannot be accidentally corrupted by arithmetic operations on the operand stack, and a stack underflow in user code cannot silently consume a return address. The operand stack and the call stack fail independently with distinct error messages. This also mirrors the design of real processors, which maintain a hardware stack pointer separate from the general-purpose registers.
+
+The cost is a modest increase in the size of the \texttt{VM} struct (128 additional \texttt{int}s, or 512 bytes on a 32-bit platform), which is negligible in practice.
+
+\subsection{No Bounds Checking on Jump Targets}
+
+The jump instructions (\texttt{JMP}, \texttt{JZ}, \texttt{JNZ}, \texttt{CALL}) write an arbitrary integer directly into \texttt{ip}:
+
+\begin{lstlisting}[language=C]
+void op_jump(VM *vm) {
+    int addr = vm->program[vm->ip++];
+    vm->ip = addr;
+}
+\end{lstlisting}
+
+No check is performed to verify that \texttt{addr} lies within the bounds of the program array. A jump to a negative index or an index beyond the end of the allocated bytecode reads from memory outside the \texttt{Program} buffer — undefined behaviour. In practice, the \texttt{Program} struct allocates a fixed \texttt{words[1024]} array on the stack in \texttt{main}, so an out-of-bounds jump reads from adjacent stack memory rather than segfaulting, which makes the resulting behaviour difficult to diagnose.
+
+A minimal fix would be to pass the program length into \texttt{vm\_run} and check the target against it before assigning to \texttt{ip}. The current design omits this check in the interest of simplicity, which is an acceptable trade-off for a development tool where the programmer controls the bytecode.
+
+\subsection{The REPL's Auto-Reset Behaviour}
+
+After each successful run, the REPL resets the program buffer automatically:
+
+\begin{lstlisting}[language=C]
+prog.length = 0;
+\end{lstlisting}
+
+This is a deliberate usability decision. Without it, a blank-line trigger would re-execute the same program on every subsequent blank line, which is surprising behaviour. The auto-reset means each execution is a clean slate, matching the expectation that the REPL is a scratch pad for experimentation rather than a persistent program store. The explicit \texttt{RESET} command exists for cases where the user wants to clear the buffer \textit{without} running first.
