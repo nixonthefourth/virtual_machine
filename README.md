@@ -54,7 +54,7 @@ The trade-off is that stack machines can require more instructions than a regist
 - [x] Call stack with 128-frame depth (`CALL` / `RET`)
 - [x] Runtime error detection: overflow, underflow, division by zero, invalid register
 - [ ] Save/load programs as `.txt` files
-- [ ] Accompanying LaTeX paper
+- [x] Accompanying LaTeX paper
 - [ ] SFML visual interface
 
 ---
@@ -392,7 +392,7 @@ The REPL and assembler will pick it up automatically — no other changes requir
 
 - [ ] Save and load programs as `.txt` files
 - [ ] SFML visual interface
-- [ ] LaTeX paper documenting the architecture
+- [x] LaTeX paper documenting the architecture
 
 ---
 

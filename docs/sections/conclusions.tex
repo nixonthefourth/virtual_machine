@@ -1,0 +1,66 @@
+\section{conclusions}
+
+This project has demonstrated that a functional stack-based virtual machine 
+complete with a custom instruction set, an assembler, and an interactive REPL 
+can be implemented in roughly 600 lines of C with no dependencies beyond the 
+standard library. The result is a system small enough to be read and understood 
+in its entirety, yet expressive enough to evaluate arithmetic expressions, 
+implement conditional logic, execute recursive function calls, and maintain 
+persistent state across loop iterations using sixteen general-purpose registers.
+
+Several design decisions proved their value through the implementation process. 
+Centralising \texttt{push} and \texttt{pop} in \texttt{vm.c} ensured that 
+stack-safety checks exist in exactly one place each, eliminating an entire 
+class of potential inconsistency. Separating the operand and call stacks 
+prevented return addresses from being silently corrupted by arithmetic 
+operations — a subtle correctness property that real processors enforce in 
+hardware. Zero-initialising the \texttt{VM} struct with \texttt{= \{0\}} 
+eliminated a category of non-deterministic behaviour at negligible cost. And 
+confining each opcode category to its own translation unit kept the codebase 
+navigable throughout development.
+
+The implementation notes in Section~5 are equally instructive for what they 
+reveal about the cost of incomplete error handling. The latent bugs in 
+\texttt{op\_div} and \texttt{op\_store}, both caused by missing \texttt{return} 
+statements after setting \texttt{running = 0} – illustrate a recurring pitfall 
+in C: the language provides no mechanism to enforce that an error branch 
+terminates. In a larger system these defects could manifest as memory corruption 
+or undefined behaviour that is difficult to reproduce. The correct pattern, 
+demonstrated in every other handler, is to use early returns and 
+\texttt{else} guards so that error paths and computation paths are structurally 
+mutually exclusive.
+
+The comparison with the JVM, CPython, and WebAssembly in Section~6 places 
+this project in a wider context. All four systems share the same stack-based 
+execution model, which confirms that the stack machine is not merely a 
+pedagogical simplification — it is an architectural choice that production 
+language designers have independently adopted because its specification and 
+implementation costs are genuinely low. What distinguishes the production 
+systems is the machinery layered on top: type systems, bytecode verifiers, 
+garbage collectors, just-in-time compilers, and formally specified memory 
+models. This VM occupies the simplest possible position on every one of those 
+axes, and that simplicity is the point. Every layer that was deliberately 
+omitted is a layer whose absence makes the remaining design easier to reason 
+about.
+
+Future work could extend the VM in several directions. Adding a linear 
+byte-addressable memory region analogous to WebAssembly's linear memory 
+would allow the VM to represent strings and arrays, removing the most 
+significant expressive limitation of the current design. Introducing a type tag 
+in the high bits of each stack word would enable basic runtime type checking 
+without changing the integer representation of values. Bounds-checking jump 
+targets before assigning to \texttt{ip} would close the only remaining source 
+of undefined behaviour. Each of these extensions can be made incrementally, 
+touching at most the files identified in the separation-of-concerns analysis, 
+which validates the modularity of the original architecture.
+
+The virtual machine would also benefit from save/load using .txt files in order to save
+previously-written programs; as well as a separate interface using C++ library like SFML
+to provide cleaner visual identity and editing capabilities to the software.
+
+Ultimately, this project achieves the goal stated in its motivation: to make 
+explicit every design decision that a language runtime ordinarily hides. The 
+fetch–decode–execute loop, the implicit operand convention of a stack machine, 
+the mechanics of a call stack, and the encoding of a flat integer bytecode 
+stream are no longer abstractions. They are concrete, readable, and — 
+intentional bugs aside — correct.
