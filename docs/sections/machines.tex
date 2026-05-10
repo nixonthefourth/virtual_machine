@@ -28,23 +28,29 @@ Wasm also defines a \textit{linear memory} model – a flat, byte-addressable ar
 
 \subsection{Summary of Differences}
 
-\begin{center}
-\begin{tabular}{lllll}
+\begin{table}[H]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+\caption{Comparison of this VM with production virtual machines}
+\label{tab:vm-comparison}
+\begin{tabular}{@{}p{0.22\linewidth}p{0.16\linewidth}p{0.16\linewidth}p{0.18\linewidth}p{0.16\linewidth}@{}}
 \toprule
 \textbf{Property} & \textbf{This VM} & \textbf{JVM} & \textbf{CPython} & \textbf{Wasm} \\
 \midrule
-Architecture          & Stack-based   & Stack-based   & Stack-based   & Stack-based \\
-Value types           & \texttt{int} only & Typed slots & Python objects & i32/i64/f32/f64 \\
-Static verification   & None          & Bytecode verifier & None        & Full type check \\
-Execution model       & Interpreted   & JIT compiled  & Interpreted   & Interpreted / JIT \\
-Memory model          & Stack + 16 regs & Heap (GC)   & Heap (RC + GC) & Linear memory \\
-Heap allocation       & None          & Yes (GC)      & Yes (RC)      & Yes (manual) \\
+Architecture          & Stack-based & Stack-based & Stack-based & Stack-based \\
+Value types           & \texttt{int} only & Typed slots & Python objects & \texttt{i32}, \texttt{i64}, \texttt{f32}, \texttt{f64} \\
+Static verification   & None & Bytecode verifier & None & Full type check \\
+Execution model       & Interpreted & JIT compiled & Interpreted & Interpreted / JIT \\
+Memory model          & Stack + 16 regs & Heap (GC) & Heap (RC + GC) & Linear memory \\
+Heap allocation       & None & Yes (GC) & Yes (RC) & Yes (manual) \\
 Call frames           & Single shared stack & Per-frame stack & Per-frame + locals & Per-frame stack \\
-External dependencies & None          & JDK runtime   & CPython runtime & Host environment \\
-Lines of C source     & $\sim$600     & $\sim$350,000 & $\sim$500,000 & varies \\
+External dependencies & None & JDK runtime & CPython runtime & Host environment \\
+Lines of C source     & $\sim$600 & $\sim$350,000 & $\sim$500,000 & varies \\
 \bottomrule
 \end{tabular}
-\end{center}
+\end{table}
 
 The table makes clear that this project occupies the simplest possible position on almost every axis. That is not a shortcoming — it is the consequence of optimising for a different goal. The JVM, CPython, and Wasm are each production systems that must handle untrusted code safely, integrate with large ecosystems, and deliver competitive performance. This VM must be readable, buildable in a single \texttt{gcc} invocation, and small enough that every design decision can be explained in a short paper. On those criteria it succeeds completely.
 
