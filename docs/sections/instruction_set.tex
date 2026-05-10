@@ -4,7 +4,7 @@ This section documents every opcode supported by the VM. Instructions are groupe
 
 \subsection*{Notation}
 
-Stack effects are written in the form \texttt{before~--~after}, where the rightmost element is the top of the stack. For example, \texttt{a~b~--~(a+b)} means two values are consumed and one is produced. The symbol \texttt{--} separates the state before the instruction executes from the state after. An empty left-hand side means the instruction pushes without consuming; an empty right-hand side means it consumes without pushing.
+Stack effects are written in the form \texttt{before~--~after}, where the rightmost element is the top of the stack. For example, \texttt{a~b~--~(a+b)} means two values are consumed and one is produced. The symbol \texttt{--} separates the state before the instruction executes from the state after. An empty left-hand side means the instruction pushes without consuming; an empty right-hand side means it consumes without pushing \cite{DragonBook,EngineeringCompiler}.
 
 Opcodes that require a literal argument encoded in the bytecode stream carry it as an immediate word following the opcode. These are marked with \texttt{<n>} (an integer literal) or \texttt{<addr>} (a bytecode word index) in the mnemonic column.
 

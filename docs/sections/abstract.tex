@@ -1,6 +1,6 @@
 \section{Abstract}
 
-This project presents the design and implementation of a stack-based virtual machine (VM) written entirely in C, conforming to the C11 standard. The machine supports a custom instruction set of 25 opcodes spanning five categories: arithmetic, logic and comparison, control flow, stack manipulation, and register operations. Alongside the VM core, the project includes a purpose-built lexer, a single-pass assembler, and an interactive Read-Evaluate-Print Loop (REPL) shell — all implemented from scratch with no external dependencies beyond the C standard library.
+This project presents the design and implementation of a stack-based virtual machine (VM) written entirely in C, conforming to the C11 standard \cite{C11Standard}. The machine supports a custom instruction set of 25 opcodes spanning five categories: arithmetic, logic and comparison, control flow, stack manipulation, and register operations. Alongside the VM core, the project includes a purpose-built lexer, a single-pass assembler, and an interactive Read-Evaluate-Print Loop (REPL) shell — all implemented from scratch with no external dependencies beyond the C standard library.
 
 \subsection*{Motivation}
 
@@ -8,7 +8,7 @@ The primary motivation for this project was a curiosity-driven investigation int
 
 \subsection*{Architecture Overview}
 
-The VM follows a classical \textit{fetch–decode–execute} cycle. On each tick, the instruction pointer (\texttt{ip}) reads the next integer from a flat bytecode array (the \textit{fetch} phase). The integer is dispatched through a \texttt{switch} statement (the \textit{decode} phase), which routes execution to the appropriate handler function (the \textit{execute} phase). The loop continues until a \texttt{HALT} instruction sets the running flag to zero.
+The VM follows a classical \textit{fetch–decode–execute} cycle \cite{ComputerArchitecture}. On each tick, the instruction pointer (\texttt{ip}) reads the next integer from a flat bytecode array (the \textit{fetch} phase). The integer is dispatched through a \texttt{switch} statement (the \textit{decode} phase), which routes execution to the appropriate handler function (the \textit{execute} phase). The loop continues until a \texttt{HALT} instruction sets the running flag to zero.
 
 The complete runtime state is encapsulated in a single \texttt{VM} struct:
 
@@ -29,10 +29,10 @@ Most modern physical CPUs are register-based: they shuttle values between a fixe
     \item \textbf{Implementation simplicity.} There is no register-allocation problem to solve. Every opcode knows exactly where its inputs are (the top of the stack) and where to leave its result (back on the top). The interpreter loop reduces to a clean \texttt{switch} over a flat integer array with no complex decode logic.
     \item \textbf{Compact bytecode.} Because operands are implicit, most instructions occupy a single integer word. Only instructions that require a literal value — \texttt{PUSH}, \texttt{JMP}, \texttt{JZ}, \texttt{JNZ}, \texttt{CALL}, \texttt{LD}, and \texttt{ST} — consume an additional word for that operand. This keeps the bytecode representation minimal and the assembler trivial to implement.
     \item \textbf{Portability.} The VM state is composed entirely of plain \texttt{int} arrays and integers. There are no platform-specific intrinsics, no inline assembly, and no OS-level system calls beyond \texttt{printf}. The same source compiles and behaves identically on Linux, macOS, and Windows via CMake.
-    \item \textbf{Pedagogical clarity.} Stack machines have a direct correspondence with how arithmetic expressions are evaluated in postfix (Reverse Polish Notation) form. The execution model is easy to trace step by step, making this architecture a natural fit for studying how high-level expressions are lowered into a sequence of low-level operations — the same transformation performed by production compilers targeting the JVM or the .NET CLR.
+    \item \textbf{Pedagogical clarity.} Stack machines have a direct correspondence with how arithmetic expressions are evaluated in postfix (Reverse Polish Notation) form \cite{RPN}. The execution model is easy to trace step by step, making this architecture a natural fit for studying how high-level expressions are lowered into a sequence of low-level operations — the same transformation performed by production compilers targeting the JVM \cite{JVMSpec} or the .NET CLR \cite{CLRSpec}.
 \end{itemize}
 
-The primary trade-off is instruction count: a stack machine often requires additional instructions (\texttt{DUP}, \texttt{SWAP}) to reorder operands that a register machine could address directly. This mirrors the philosophy of Reduced Instruction Set Computing (RISC), where a smaller, more uniform instruction set simplifies the processor at the cost of requiring more instructions to perform equivalent work. For a teaching and experimentation platform, this cost is entirely acceptable.
+The primary trade-off is instruction count: a stack machine often requires additional instructions (\texttt{DUP}, \texttt{SWAP}) to reorder operands that a register machine could address directly. This mirrors the philosophy of Reduced Instruction Set Computing (RISC) \cite{RISC}, where a smaller, more uniform instruction set simplifies the processor at the cost of requiring more instructions to perform equivalent work. For a teaching and experimentation platform, this cost is entirely acceptable.
 
 \subsection*{Toolchain: Lexer, Assembler, and REPL}
 

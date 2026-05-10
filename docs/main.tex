@@ -10,6 +10,9 @@
 \usepackage{microtype}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage[style=numeric,sorting=none,backend=biber]{biblatex}
+
+\addbibresource{references.bib}
 
 \lstset{
     basicstyle=\ttfamily\small,
@@ -35,5 +38,7 @@
 \input{sections/implementation_notes.tex}
 \input{sections/machines.tex}
 \input{sections/conclusions.tex}
+
+\printbibliography
 
 \end{document}
